@@ -10,7 +10,12 @@ import {
   TouchableOpacity,
   TouchableHighlight
 } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import Foundation from "react-native-vector-icons/Foundation";
 import uuid from "uuid";
+import Icon from "react-native-vector-icons/FontAwesome";
+const myIcon = <Icon name="rocket" size={30} color="#900" />;
 const makeid = length => {
   var result = "";
   var characters =
@@ -55,15 +60,23 @@ export default class Todo extends React.Component {
       todos: prevState.todos.filter(todoItem => todoItem !== itemToBeRemoved)
     }));
   };
+
+  alert = item => {
+    alert(item);
+  };
   render() {
     return (
       //container View
       <View style={styles.container}>
         {/* Header View */}
         <View style={styles.headerContainer}>
-          <Text style={styles.headerText}> Menu </Text>
-          <Text style={styles.headerText}> Todo App </Text>
-          <Text style={styles.headerText}> Settings </Text>
+          <View style={styles.headerContainer}>
+            <Text>
+              <Ionicons name="md-menu" size={30} color="#ffff" />
+            </Text>
+            <Text style={styles.headerText}> Todo App </Text>
+            <AntDesign name="setting" size={32} color="white" />
+          </View>
         </View>
 
         {/* Body View */}
@@ -92,7 +105,14 @@ export default class Todo extends React.Component {
             data={this.state.todos}
             renderItem={({ item }) => (
               <View style={styles.renderItemView}>
-                <Text style={styles.todoItemText}>{item}</Text>
+                <Text
+                  onPress={e => {
+                    this.alert(item);
+                  }}
+                  style={styles.todoItemText}
+                >
+                  {item}
+                </Text>
                 <TouchableOpacity
                   onPress={e => {
                     this.handleDeleteOneItem(item);

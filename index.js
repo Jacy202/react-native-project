@@ -9,5 +9,6 @@ import MyApp from "./MyApp";
 import List from "./src/components/List";
 import FlatListExample from "./src/components/FlatListExample";
 import Touchables from "./src/components/Touchables";
+import AppContainer from "./AppContainer";
 
-AppRegistry.registerComponent(appName, () => MyApp);
+AppRegistry.registerComponent(appName, () => AppContainer);

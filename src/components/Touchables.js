@@ -7,7 +7,9 @@ import {
   TouchableNativeFeedback,
   TouchableHighlight
 } from "react-native";
-
+import FlatListExample from "./FlatListExample";
+import Todo from "./Todo";
+import Likes from "./Flex";
 const Touchables = props => {
   onPress = () => {
     // alert('hello')
@@ -16,11 +18,8 @@ const Touchables = props => {
     <View style={styles.container}>
       {/* TouchableOpacity */}
       <TouchableOpacity
-        // onPress={() => {
-        //   props.navigation.navigate("Flex");
-        // }}
         onPress={() => {
-          console.warn("hello");
+          props.navigation.navigate("Todo");
         }}
         style={styles.touches}
       >
@@ -33,7 +32,7 @@ const Touchables = props => {
         //   props.navigation.navigate("Todo");
         // }}
         onPress={() => {
-          console.warn("hello");
+          props.navigation.navigate("Likes");
         }}
       >
         <View style={styles.touches}>
@@ -47,7 +46,7 @@ const Touchables = props => {
         //   props.navigation.navigate("Likes");
         // }}
         onPress={() => {
-          console.warn("hello");
+          props.navigation.navigate("FlatListExample");
         }}
       >
         <Text style={styles.text}> TouchableHighlight</Text>

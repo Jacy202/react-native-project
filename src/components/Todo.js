@@ -6,16 +6,19 @@ import {
   View,
   FlatList,
   TextInput,
-  Button,
   TouchableOpacity,
-  TouchableHighlight
+  TouchableHighlight,
+  DrawerLayoutAndroid,
+  TouchableNativeFeedback,
+  AsyncStorage
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import Foundation from "react-native-vector-icons/Foundation";
-import uuid from "uuid";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Menu from "./Menu";
+
 const myIcon = <Icon name="rocket" size={30} color="#900" />;
+
 const makeid = length => {
   var result = "";
   var characters =
@@ -30,8 +33,34 @@ const makeid = length => {
 export default class Todo extends React.Component {
   state = {
     newTodo: "",
-    todos: ["Study", "code", "eat"]
+    todos: []
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.todos.length !== this.state.todos.length) {
+      const jsonState = JSON.stringify(this.state.todoItems);
+
+      AsyncStorage.setItem("todos", jsonState)
+
+        .then(value => value)
+
+        .catch(err => console.warn(err));
+    }
+  }
+
+  componentDidMount() {
+    AsyncStorage.getItem("todos")
+      .then(value => {
+        if (value !== null) {
+          // if value is not null or if Asynctorage is not empty.
+          let valueToArray = JSON.parse(value);
+          this.setState({
+            todos: valueToArray
+          });
+        }
+      })
+      .catch(err => console.warn(err));
+  }
 
   addTodo = () => {
     if (!this.state.newTodo) {
@@ -59,84 +88,109 @@ export default class Todo extends React.Component {
     this.setState(prevState => ({
       todos: prevState.todos.filter(todoItem => todoItem !== itemToBeRemoved)
     }));
+
+    alert = item => {
+      alert(item);
+    };
   };
 
-  alert = item => {
-    alert(item);
+  openDrawer = () => {
+    this.drawer.openDrawer();
+  };
+
+  closeDrawer = () => {
+    this.drawer.closeDrawer();
+  };
+
+  static navigationOptions = {
+    header: null
   };
   render() {
     return (
-      //container View
-      <View style={styles.container}>
-        {/* Header View */}
-        <View style={styles.headerContainer}>
+      <DrawerLayoutAndroid
+        drawerWidth={300}
+        drawerPosition={DrawerLayoutAndroid.positions.Left}
+        renderNavigationView={() => (
+          <Menu
+            navigation={this.props.navigation}
+            closeDrawer={this.closeDrawer}
+          />
+        )}
+        ref={_drawer => {
+          this.drawer = _drawer;
+        }}
+      >
+        <View style={styles.container}>
+          {/* Header View */}
           <View style={styles.headerContainer}>
-            <Text>
-              <Ionicons name="md-menu" size={30} color="#ffff" />
-            </Text>
+            <TouchableNativeFeedback onPress={(onPress = this.openDrawer)}>
+              <View>
+                <Ionicons name="md-menu" size={32} color="white" />
+              </View>
+            </TouchableNativeFeedback>
             <Text style={styles.headerText}> Todo App </Text>
             <AntDesign name="setting" size={32} color="white" />
           </View>
-        </View>
 
-        {/* Body View */}
-        <View style={styles.body}>
-          {/* Input and Button View */}
-          {/* TextInput */}
-          <View style={styles.textAndButtonView}>
-            <TextInput
-              style={styles.textInput}
-              value={this.state.newTodo}
-              underlineColorAndroid="transparent"
-              placeholder="New Todo"
-              placeholderTextColor="gray"
-              autoCapitalize="none"
-              onChangeText={this.handleChangeText}
+          {/* Body View */}
+          <View style={styles.body}>
+            {/* Input and Button View */}
+            {/* TextInput */}
+            <View style={styles.textAndButtonView}>
+              <TextInput
+                style={styles.textInput}
+                value={this.state.newTodo}
+                underlineColorAndroid="transparent"
+                placeholder="New Todo"
+                placeholderTextColor="gray"
+                autoCapitalize="none"
+                onChangeText={this.handleChangeText}
+              />
+
+              {/* Button */}
+              <TouchableOpacity onPress={this.addTodo} style={styles.addButton}>
+                <Text style={styles.buttonText}>add todo</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Todo Items View */}
+            <FlatList
+              data={this.state.todos}
+              renderItem={({ item }) => (
+                <View style={styles.renderItemView}>
+                  <Text
+                    onPress={e => {
+                      this.alert(item);
+                    }}
+                    style={styles.todoItemText}
+                  >
+                    {item}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={e => {
+                      this.handleDeleteOneItem(item);
+                    }}
+                  >
+                    <Text style={styles.deleteItemText}>X</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              keyExtractor={item => makeid(5)}
             />
 
-            {/* Button */}
-            <TouchableOpacity onPress={this.addTodo} style={styles.addButton}>
-              <Text style={styles.buttonText}>add todo</Text>
-            </TouchableOpacity>
+            {/* Remove all button */}
+            <TouchableHighlight
+              style={styles.removeButton}
+              onPress={this.handleDeleteAll}
+            >
+              <Text style={styles.buttonText}> Remove all</Text>
+            </TouchableHighlight>
           </View>
 
-          {/* Todo Items View */}
-          <FlatList
-            data={this.state.todos}
-            renderItem={({ item }) => (
-              <View style={styles.renderItemView}>
-                <Text
-                  onPress={e => {
-                    this.alert(item);
-                  }}
-                  style={styles.todoItemText}
-                >
-                  {item}
-                </Text>
-                <TouchableOpacity
-                  onPress={e => {
-                    this.handleDeleteOneItem(item);
-                  }}
-                >
-                  <Text style={styles.deleteItemText}>X</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            keyExtractor={item => makeid(5)}
-          />
-
-          {/* Remove all button */}
-          <TouchableHighlight
-            style={styles.removeButton}
-            onPress={this.handleDeleteAll}
-          >
-            <Text style={styles.buttonText}> Remove all</Text>
-          </TouchableHighlight>
+          {/* Footer View */}
+          <View style={{ flex: 1, backgroundColor: "#222e50" }} />
         </View>
-
-        {/* Footer View */}
-        <View style={{ flex: 1, backgroundColor: "#222e50" }} />
-      </View>
+      </DrawerLayoutAndroid>
     );
   }
 }

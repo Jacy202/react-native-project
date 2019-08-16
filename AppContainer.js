@@ -5,16 +5,32 @@ import Likes from "./src/components/Likes";
 import Todo from "./src/components/Todo";
 import Flex from "./src/components/Flex";
 import List from "./src/components/List";
-import FlatlistExample from "./src/components/FlatListExample";
+import FlatListExample from "./src/components/FlatListExample";
 import Touchables from "./src/components/Touchables";
+import Menu from "./src/components/Menu";
 
-const AppNavigator = createStackNavigator({
-  Likes: Likes,
-  Todo: Todo,
-  Flex: Flex,
-  List: List,
-  FlatlistExample: FlatlistExample,
-  Touchables: Touchables
-});
+const AppNavigator = createStackNavigator(
+  {
+    Likes,
+    Todo,
+    Flex,
+    List,
+    FlatListExample,
+    Touchables,
+    Menu
+  },
+  {
+    initialRouteName: "Menu",
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: "#222e50"
+      },
+      headerTintColor: "#fff",
+      headerTitleStyle: {
+        fontWeight: "bold"
+      }
+    }
+  }
+);
 
 export default (AppContainer = createAppContainer(AppNavigator));

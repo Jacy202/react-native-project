@@ -1,3 +1,5 @@
+//Menu.js
+// /components/Menu.js
 import React, { Component } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -6,6 +8,7 @@ export default class Menu extends Component {
   static navigationOptions = {
     header: null
   };
+
   render() {
     return (
       <View style={styles.Menucontainer}>
@@ -27,12 +30,13 @@ export default class Menu extends Component {
               style={styles.boardText}
               onPress={() => {
                 this.props.navigation.navigate("Todo");
-                // this.props.closeDrawer();
+                this.props.closeDrawer();
               }}
             >
               Todo App
             </Text>
           </View>
+
           <View style={styles.eachIcon}>
             <AntDesign
               name="like2"
@@ -43,13 +47,14 @@ export default class Menu extends Component {
             <Text
               onPress={() => {
                 this.props.navigation.navigate("Likes");
-                // this.props.closeDrawer();
+                this.props.closeDrawer();
               }}
               style={styles.boardText}
             >
               Likes App
             </Text>
           </View>
+
           <View style={styles.eachIcon}>
             <MaterialIcons
               name="touch-app"
@@ -60,7 +65,7 @@ export default class Menu extends Component {
             <Text
               onPress={() => {
                 this.props.navigation.navigate("Touchables");
-                // this.props.closeDrawer();
+                this.props.closeDrawer();
               }}
               style={styles.boardText}
             >
@@ -72,6 +77,7 @@ export default class Menu extends Component {
     );
   }
 }
+
 const styles = StyleSheet.create({
   Menucontainer: {
     flex: 1
@@ -100,9 +106,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingBottom: 7
   },
-
   profileImage: {
-    height: 100,
-    width: 150
+    height: 250,
+    width: 300
   }
 });

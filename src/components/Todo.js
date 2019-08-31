@@ -10,15 +10,13 @@ import {
   TouchableHighlight,
   DrawerLayoutAndroid,
   TouchableNativeFeedback,
-  AsyncStorage
+  ActivityIndicator
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Entypo from "react-native-vector-icons/Entypo";
 import Menu from "./Menu";
-
-const myIcon = <Icon name="rocket" size={30} color="#900" />;
-
+import AsyncStorage from "@react-native-community/async-storage";
 const makeid = length => {
   var result = "";
   var characters =
@@ -33,35 +31,44 @@ const makeid = length => {
 export default class Todo extends React.Component {
   state = {
     newTodo: "",
-    todos: []
+    todos: [],
+    isAnimating: false
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.todos.length !== this.state.todos.length) {
-      const jsonState = JSON.stringify(this.state.todoItems);
-
-      AsyncStorage.setItem("todos", jsonState)
-
-        .then(value => value)
-
-        .catch(err => console.warn(err));
-    }
-  }
-
-  componentDidMount() {
-    AsyncStorage.getItem("todos")
-      .then(value => {
+  async componentDidMount() {
+    //  setState here
+    this.setState({
+      isAnimating: true
+    });
+    //setTimeout here
+    setTimeout(async () => {
+      try {
+        const value = await AsyncStorage.getItem("todos");
         if (value !== null) {
           // if value is not null or if Asynctorage is not empty.
           let valueToArray = JSON.parse(value);
           this.setState({
-            todos: valueToArray
+            todos: valueToArray,
+            isAnimating: false
           });
         }
-      })
-      .catch(err => console.warn(err));
+      } catch (e) {
+        console.warn(err);
+      }
+    }, 5000);
   }
 
+  async componentDidUpdate(prevProps, prevState) {
+    if (prevState.todos.length !== this.state.todos.length) {
+      const jsonState = JSON.stringify(this.state.todos);
+      try {
+        //saving starts here
+        const value = await AsyncStorage.setItem("todos", jsonState);
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+  }
   addTodo = () => {
     if (!this.state.newTodo) {
       return;
@@ -88,12 +95,11 @@ export default class Todo extends React.Component {
     this.setState(prevState => ({
       todos: prevState.todos.filter(todoItem => todoItem !== itemToBeRemoved)
     }));
-
-    alert = item => {
-      alert(item);
-    };
   };
 
+  alert = item => {
+    alert(item);
+  };
   openDrawer = () => {
     this.drawer.openDrawer();
   };
@@ -107,6 +113,7 @@ export default class Todo extends React.Component {
   };
   render() {
     return (
+      //container View
       <DrawerLayoutAndroid
         drawerWidth={300}
         drawerPosition={DrawerLayoutAndroid.positions.Left}
@@ -149,9 +156,13 @@ export default class Todo extends React.Component {
 
               {/* Button */}
               <TouchableOpacity onPress={this.addTodo} style={styles.addButton}>
-                <Text style={styles.buttonText}>add todo</Text>
+                <Entypo name="add-to-list" size={20} color="white" />
               </TouchableOpacity>
             </View>
+            {/* Activity indicator */}
+            {this.state.isAnimating && (
+              <ActivityIndicator size="large" color="#222e50" />
+            )}
 
             {/* Todo Items View */}
             <FlatList
@@ -183,7 +194,7 @@ export default class Todo extends React.Component {
               style={styles.removeButton}
               onPress={this.handleDeleteAll}
             >
-              <Text style={styles.buttonText}> Remove all</Text>
+              <Text style={styles.removeButtonText}> Remove all</Text>
             </TouchableHighlight>
           </View>
 
@@ -205,13 +216,14 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flex: 1,
-    paddingRight: 5,
-    paddingLeft: 5,
+    paddingBottom: 4,
+    paddingRight: 10,
+    paddingLeft: 10,
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    backgroundColor: "#222e50",
-    alignItems: "flex-end",
-    borderBottomColor: "#ffffff",
+    justifyContent: "space-between",
+    backgroundColor: "#3d0b37",
+    alignItems: "center",
+    borderBottomColor: "#330036",
     borderBottomWidth: 0.5
   },
   todoText: {
@@ -242,9 +254,10 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 15
   },
+
   addButton: {
     padding: 8,
-    backgroundColor: "#222e50",
+    backgroundColor: "#861388",
     borderRadius: 5,
     marginBottom: 30,
     width: "25%",
@@ -256,12 +269,19 @@ const styles = StyleSheet.create({
   },
 
   removeButton: {
-    backgroundColor: "#222e50",
+    backgroundColor: "#861388",
     width: "100%",
     padding: 10,
     marginTop: 20,
     borderRadius: 5,
-    alignItems: "center"
+    alignItems: "center",
+    borderRadius: 5,
+    borderWidth: 0.5,
+    borderColor: "#222e50"
+  },
+  removeButtonText: {
+    color: "white",
+    fontSize: 15
   },
   renderItemView: {
     flexDirection: "row",
